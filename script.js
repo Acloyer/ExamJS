@@ -91,16 +91,36 @@ class TasksManager {
         }
     }
 
+    // sortTasks(sortBy) {
+    //     if (sortBy === 'name') {
+    //         return this.tasks.slice().sort((a, b) => a.name.localeCompare(b.name));
+    //     } else if (sortBy === 'date') {
+    //         return this.tasks.slice().sort((a, b) => new Date(b.date) - new Date(a.date));
+    //     }
+    // }
     sortTasks(sortBy) {
         if (sortBy === 'name') {
             return this.tasks.slice().sort((a, b) => a.name.localeCompare(b.name));
         } else if (sortBy === 'date') {
-            return this.tasks.slice().sort((a, b) => new Date(b.date) - new Date(a.date));
+            return this.tasks.slice().sort((a, b) => convertDateToStandardFormat(b.date) - convertDateToStandardFormat(a.date));
         }
     }
+    
 }
 
 const tasksManager = new TasksManager();
+//
+
+function convertDateToStandardFormat(dateString) {
+    const parts = dateString.split(' ');
+    const datePart = parts[0];
+    const timePart = parts[1];
+    const [day, month, year] = datePart.split('.').map(Number);
+    const [hours, minutes, seconds] = timePart.split(':').map(Number);
+    return new Date(year, month - 1, day, hours, minutes, seconds);
+}
+
+//
 
 // начало
 // начало
