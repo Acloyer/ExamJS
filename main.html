@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Список задач</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>Список задач</h1>
+    <div class="task-form">
+        <input type="text" id="task-name" placeholder="Название задачи">
+        <input type="text" id="task-description" placeholder="Подробное описание">
+        <input type="color" id="task-color" value="#000000">
+        <button id="add-task">Добавить задачу</button>
+    </div>
+    <div class="filters">
+        <select id="sort-select">
+            <option value="name">Сортировать по названию</option>
+            <option value="date">Сортировать по дате</option>
+        </select>
+        <select id="filter-select">
+            <option value="all">Все задачи</option>
+            <option value="completed">Выполненные</option>
+            <option value="incomplete">Невыполненные</option>
+        </select>
+    </div>
+
+    <!-- <div>
+        <input type="text" id="filter-keyword" placeholder="Фильтр по ключевому слову">
+        <button id="apply-filter">Применить фильтр</button>
+    </div> -->
+
+    <div class="task-list">
+        <!-- Список задач будет здесь -->
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
