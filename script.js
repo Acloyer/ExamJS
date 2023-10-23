@@ -169,7 +169,22 @@ class TasksManager {
     }
     
 }
+// Модальное окно
+function sorryModal(){
+    const confirmationModal = document.getElementById("sorry-modal");
+    const confirmDeleteButton = document.getElementById("confirm");
+    confirmationModal.style.display = "block";
+    
+    function closeConfirmationModal() {
+        confirmationModal.style.display = "none";
+    }
+    
+    confirmDeleteButton.addEventListener("click", () => {
+        closeConfirmationModal();
+    });
+}
 
+//
 
 const tasksManager = new TasksManager();
 //
@@ -231,7 +246,7 @@ document.getElementById("add-task").addEventListener("click", () => {
     const currentDate = new Date();
     const formattedDate = `${currentDate.getDate()}.${currentDate.getMonth() + 1}.${currentDate.getFullYear()} ${currentDate.toLocaleTimeString("ru-RU")}`;
 
-    const timeRegex = /^[a-zA-Z0-9\s]+$/i;
+    const timeRegex = /^[a-zA-Zа-яА-Я0-9\s]+$/i;
     
     if (timeRegex.test(name)) {
         if (timeRegex.test(description)) {
@@ -242,18 +257,18 @@ document.getElementById("add-task").addEventListener("click", () => {
                 updateTaskList();
             }
             else{
-                alert("Ошибка при добавлении.");
+                sorryModal();
             }
         }
         else{
-            alert("Введите пожалуйста описание без символов.");
+            sorryModal();
         }
     }
     else{
-        alert("Введите пожалуйста название без символов.");
+        sorryModal();
     }
-    updateTaskList();
 });
+updateTaskList();
 
 // конец
 // конец
@@ -303,7 +318,7 @@ function updateTaskList() {
                 <label style="color: ${task.color || 'black'}" for="task-${task.id}">${task.name}</label>
                 <button class="edit-button" data-id="${task.id}">Редактировать</button>
                 <button class="delete-button" data-id="${task.id}">Удалить</button>
-                <button class="details-button" data-id="${task.id}">Подробнее</button>
+                <button class="details-button"  data-id="${task.id}">Подробнее</button>
             `;
 
             taskElement.querySelector("input").addEventListener("change", (event) => {
@@ -323,16 +338,29 @@ function updateTaskList() {
 
             taskElement.querySelector(".delete-button").addEventListener("click", (event) => {
                 const taskId = event.target.getAttribute("data-id");
-                if (confirm("Вы уверены, что хотите удалить эту задачу?")) {
+                const confirmationModal = document.getElementById("confirmation-modal");
+                const confirmDeleteButton = document.getElementById("confirm-delete");
+                const cancelDeleteButton = document.getElementById("cancel-delete");
+                confirmationModal.style.display = "block";
+
+
+                // function openConfirmationModal(taskId) {
+                //     taskIdToDelete = taskId;
+                // }
+
+                function closeConfirmationModal() {
+                    confirmationModal.style.display = "none";
+                }
+
+                confirmDeleteButton.addEventListener("click", () => {
                     if (tasksManager.deleteTask(Number(taskId))) {
                         showNotification(`Задача №${taskId} успешно удалена.`, "red")
                     }
-                    else {
-                        showNotification("Ошибка при удалении задачи.", "red")
-                        // alert("Ошибка при удалении задачи.");
-                    }
                     updateTaskList();
-                }
+                    closeConfirmationModal();
+                });
+                
+                cancelDeleteButton.addEventListener("click", closeConfirmationModal);
             });
 
             taskList.appendChild(taskElement);
