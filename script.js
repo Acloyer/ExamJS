@@ -91,17 +91,13 @@ class TasksManager {
         }
     }
 
-    // sortTasks(sortBy) {
-    //     if (sortBy === 'name') {
-    //         return this.tasks.slice().sort((a, b) => a.name.localeCompare(b.name));
-    //     } else if (sortBy === 'date') {
-    //         return this.tasks.slice().sort((a, b) => new Date(b.date) - new Date(a.date));
-    //     }
-    // }
     sortTasks(sortBy) {
         if (sortBy === 'name') {
             return this.tasks.slice().sort((a, b) => a.name.localeCompare(b.name));
         } else if (sortBy === 'date') {
+            return this.tasks.slice().sort((a, b) => convertDateToStandardFormat(b.date) - convertDateToStandardFormat(a.date));
+        }
+        else if (sortBy === 'priority') {
             return this.tasks.slice().sort((a, b) => convertDateToStandardFormat(b.date) - convertDateToStandardFormat(a.date));
         }
     }
@@ -110,6 +106,42 @@ class TasksManager {
 
 const tasksManager = new TasksManager();
 //
+// notificilations - уведомления выводятся тогда когда добавляется задача либо удаляется
+const notificationsContainer = document.querySelector('.notifications');
+
+function createNotification(message, background_color, color) {
+  const notification = document.createElement('div');
+  notification.className = 'notification hide';
+  notification.textContent = message;
+  notification.style = `background-color: ${background_color};
+                        color: ${color};`;
+  notification.addEventListener('click', () => {
+    notification.classList.add('hide');
+    setTimeout(() => {
+      notification.remove();
+    }, 300);
+  });
+  return notification;
+}
+
+function showNotification(message, background_color, color) {
+  const notification = createNotification(message, background_color, color);
+  notificationsContainer.appendChild(notification);
+  setTimeout(() => {
+    notification.classList.remove('hide');
+  }, 10);
+  setTimeout(() => {
+    notification.classList.add('hide');
+    setTimeout(() => {
+      notification.remove();
+    }, 300);
+  }, 5000);
+}
+
+// showNotification('Уведомление 1', "green", "black");
+// showNotification('Уведомление 2', "red");
+// showNotification('Уведомление 3');
+
 
 function convertDateToStandardFormat(dateString) {
     const parts = dateString.split(' ');
@@ -137,6 +169,7 @@ document.getElementById("add-task").addEventListener("click", () => {
         if(name !== "" && description !== ""){
             document.getElementById("task-name").value = "";
             document.getElementById("task-description").value = "";
+            showNotification(`Задача №${tasksManager.idCounter-1} успешно добавлена!`, "green");
             updateTaskList();
         }
         else{
@@ -213,9 +246,11 @@ function updateTaskList() {
                 const taskId = event.target.getAttribute("data-id");
                 if (confirm("Вы уверены, что хотите удалить эту задачу?")) {
                     if (tasksManager.deleteTask(Number(taskId))) {
-                        alert("Задача успешно удалена.");
-                    } else {
-                        alert("Ошибка при удалении задачи.");
+                        showNotification(`Задача №${taskId} успешно удалена.`, "red")
+                    }
+                    else {
+                        showNotification("Ошибка при удалении задачи.", "red")
+                        // alert("Ошибка при удалении задачи.");
                     }
                     updateTaskList();
                 }
