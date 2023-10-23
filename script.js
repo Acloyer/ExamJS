@@ -231,22 +231,29 @@ document.getElementById("add-task").addEventListener("click", () => {
     const currentDate = new Date();
     const formattedDate = `${currentDate.getDate()}.${currentDate.getMonth() + 1}.${currentDate.getFullYear()} ${currentDate.toLocaleTimeString("ru-RU")}`;
 
-    if (tasksManager.addTask(name, description, formattedDate, color)) {
-        if(name !== "" && description !== ""){
-            document.getElementById("task-name").value = "";
-            document.getElementById("task-description").value = "";
-            showNotification(`Задача №${tasksManager.idCounter-1} успешно добавлена!`, "green");
-            updateTaskList();
+    const timeRegex = /^[a-zA-Z0-9]+$/i;
+
+    if (timeRegex.test(name)) {
+        if (timeRegex.test(description)) {
+            if (tasksManager.addTask(name, description, formattedDate, color)) {
+                document.getElementById("task-name").value = "";
+                document.getElementById("task-description").value = "";
+                showNotification(`Задача №${tasksManager.idCounter-1} успешно добавлена!`, "green");
+                updateTaskList();
+            }
+            else{
+                alert("Ошибка при добавлении.");
+            }
         }
         else{
-            alert("Введите пожалуйста название и описание.");
+            alert("Введите пожалуйста описание без символов.");
         }
     }
     else{
-        alert("Введите пожалуйста название и описание.");
+        alert("Введите пожалуйста название без символов.");
     }
+    updateTaskList();
 });
-updateTaskList();
 
 // конец
 // конец
