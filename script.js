@@ -12,6 +12,7 @@ class Task {
 class TasksManager {
     constructor() {
         this.tasks = this.loadTasksFromLocalStorage(); // Загружаем задачи из localStorage
+        this.historyTasks = this.loadHistoryTasksFromLocalStorage(); // Загружаем историю задач из localStorage
         this.idCounter = this.calculateIdCounter();
     }
 
@@ -29,14 +30,77 @@ class TasksManager {
         }
         return [];
     }
+    // ...
+    loadHistoryTasksFromLocalStorage() {
+        const historyTasksData = localStorage.getItem("historyTasks");
+        if (historyTasksData) {
+            try {
+                const parsedHistoryTasks = JSON.parse(historyTasksData);
+                if (Array.isArray(parsedHistoryTasks)) {
+                    return parsedHistoryTasks;
+                }
+            } catch (error) {
+                console.error("Ошибка при загрузке истории задач из localStorage:", error);
+            }
+        }
+        return [];
+    }
 
+    moveToHistory(id) {
+        const taskIndex = this.tasks.findIndex(task => task.id === id);
+        if (taskIndex !== -1) {
+            const removedTask = this.tasks.splice(taskIndex, 1)[0];
+            this.historyTasks.push(removedTask);
+            this.saveTasksToLocalStorage();
+            this.saveHistoryTasksToLocalStorage();
+            return true;
+        }
+        return false;
+    }
+
+    removeFromHistory(id) {
+        const historyTaskIndex = this.historyTasks.findIndex(task => task.id === id);
+        if (historyTaskIndex !== -1) {
+            this.historyTasks.splice(historyTaskIndex, 1);
+            this.saveHistoryTasksToLocalStorage();
+            return true;
+        }
+        return false;
+    }
+    
+    addToTasksHistory(task) {
+        const tasksHistory = this.loadHistoryTasksFromLocalStorage();
+        tasksHistory.push(task);
+        this.saveTasksHistoryToLocalStorage(tasksHistory);
+    }
+    
+    // Функция для сохранения истории задач в localStorage
+    saveTasksHistoryToLocalStorage(tasksHistory) {
+        localStorage.setItem("historyTasks", JSON.stringify(tasksHistory));
+    }
+    
+    
+    deleteTask(id) {
+        if (this.moveToHistory(id)) {
+            return true;
+        }
+        return false;
+    }
+    
+    deleteTaskFromHistory(id) {
+        if (this.removeFromHistory(id)) {
+            return true;
+        }
+        return false;
+    }
+    // ...
+    saveTasksToLocalStorage() {
+        localStorage.setItem("tasks", JSON.stringify(this.tasks));
+    }
+    
     calculateIdCounter() {
         const maxId = this.tasks.reduce((max, task) => (task.id > max ? task.id : max), 0);
         return maxId + 1;
-    }
-
-    saveTasksToLocalStorage() {
-        localStorage.setItem("tasks", JSON.stringify(this.tasks));
     }
 
     addTask(name, description, date, color) {
@@ -45,7 +109,9 @@ class TasksManager {
         }
         const task = new Task(this.idCounter++, name, description, date, color, false);
         this.tasks.push(task);
+        this.addToTasksHistory(task);
         this.saveTasksToLocalStorage(); // после добавления сохраттьбб
+        // moveToHistory(task.id);
         return true;
     }
 
@@ -104,6 +170,7 @@ class TasksManager {
     
 }
 
+
 const tasksManager = new TasksManager();
 //
 // notificilations - уведомления выводятся тогда когда добавляется задача либо удаляется
@@ -152,7 +219,6 @@ function convertDateToStandardFormat(dateString) {
     return new Date(year, month - 1, day, hours, minutes, seconds);
 }
 
-//
 
 // начало
 // начало
@@ -191,6 +257,12 @@ document.getElementById("filter-select").addEventListener("change", updateTaskLi
 document.getElementById("sort-select").addEventListener("change", updateTaskList);
 
 updateTaskList();
+
+
+const historyButton = document.getElementById("history-button");
+historyButton.addEventListener("click", () => {
+    window.location.href = "history.html";
+});
 
 // --------------------------------------------------------------------------------------
 
