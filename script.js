@@ -231,8 +231,8 @@ document.getElementById("add-task").addEventListener("click", () => {
     const currentDate = new Date();
     const formattedDate = `${currentDate.getDate()}.${currentDate.getMonth() + 1}.${currentDate.getFullYear()} ${currentDate.toLocaleTimeString("ru-RU")}`;
 
-    const timeRegex = /^[a-zA-Z0-9]+$/i;
-
+    const timeRegex = /^[a-zA-Z0-9\s]+$/i;
+    
     if (timeRegex.test(name)) {
         if (timeRegex.test(description)) {
             if (tasksManager.addTask(name, description, formattedDate, color)) {
